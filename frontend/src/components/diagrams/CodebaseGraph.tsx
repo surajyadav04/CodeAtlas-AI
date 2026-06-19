@@ -26,8 +26,10 @@ const NODE_STYLES: Record<GraphNodeType, React.CSSProperties> = {
   apiRoute: { background: "#1C1917", border: "1px solid #CCD67F", color: "#CCD67F", borderRadius: 8, fontSize: 11, padding: "6px 12px" },
 };
 
-function buildNodes(summary: RepoSummary): Node[] {
+function buildNodes(summary: RepoSummary): { nodes: Node[], pathToNodeId: Record<string, string> } {
   const nodes: Node[] = [];
+  const pathToNodeId: Record<string, string> = {};
+  
   const entries: [GraphNodeType, string[]][] = [
     ["page",     summary.pages || []],
     ["component",summary.components || []],
@@ -39,8 +41,11 @@ function buildNodes(summary: RepoSummary): Node[] {
   for (const [type, paths] of entries) {
     paths.forEach((filePath, i) => {
       const label = filePath.split("/").pop() ?? filePath;
+      const nodeId = `${type}-${i}`;
+      pathToNodeId[filePath] = nodeId;
+      
       nodes.push({
-        id: `${type}-${i}`,
+        id: nodeId,
         data: { label },
         position: { x: COLUMN_X[type], y: i * 80 },
         style: NODE_STYLES[type],
@@ -48,12 +53,51 @@ function buildNodes(summary: RepoSummary): Node[] {
     });
   }
 
-  return nodes;
+  return { nodes, pathToNodeId };
+}
+
+function buildEdges(summary: RepoSummary, pathToNodeId: Record<string, string>): Edge[] {
+  const edges: Edge[] = [];
+  if (!summary.dependencies) return edges;
+
+  const basenameToNodeId: Record<string, string> = {};
+  for (const [path, nodeId] of Object.entries(pathToNodeId)) {
+     const base = path.split("/").pop()?.split(".")[0];
+     if (base) basenameToNodeId[base.toLowerCase()] = nodeId;
+  }
+
+  let edgeCount = 0;
+  for (const [sourcePath, imports] of Object.entries(summary.dependencies)) {
+    const sourceId = pathToNodeId[sourcePath];
+    if (!sourceId) continue;
+
+    for (const imp of imports) {
+      const impBase = imp.split("/").pop()?.split(".")[0]?.toLowerCase();
+      if (!impBase) continue;
+
+      const targetId = basenameToNodeId[impBase];
+      if (targetId && targetId !== sourceId) {
+        // To avoid duplicate edges between same nodes
+        const edgeId = `e-${sourceId}-${targetId}`;
+        if (!edges.some(e => e.id === edgeId)) {
+          edges.push({
+            id: edgeId,
+            source: sourceId,
+            target: targetId,
+            animated: true,
+            style: { stroke: '#8A5F41', strokeWidth: 1.5, opacity: 0.5 },
+          });
+        }
+      }
+    }
+  }
+
+  return edges;
 }
 
 export default function CodebaseGraph({ summary }: { summary: RepoSummary }) {
-  const nodes = buildNodes(summary);
-  const edges: Edge[] = []; // Edges can be added later using imports[] metadata
+  const { nodes, pathToNodeId } = buildNodes(summary);
+  const edges = buildEdges(summary, pathToNodeId);
 
   return (
     <div className="h-full w-full bg-[#0C0A09]">

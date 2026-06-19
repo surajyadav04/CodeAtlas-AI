@@ -90,6 +90,7 @@ export async function indexRepository(
 		services: [],
 		hooks: [],
 		apiRoutes: [],
+		dependencies: {},
 		stats: {
 			files: scannedFiles - skippedFiles,
 			components: 0,
@@ -136,6 +137,19 @@ export async function indexRepository(
 		if ((chunk.kind === "function" || chunk.kind === "method") && chunk.symbolName) {
 			uniqueFunctions.add(chunk.symbolName);
 		}
+
+		// Extract dependencies
+		if (chunk.imports && chunk.imports.length > 0) {
+			if (!summary.dependencies[relativePath]) {
+				summary.dependencies[relativePath] = [];
+			}
+			summary.dependencies[relativePath].push(...chunk.imports);
+		}
+	}
+
+	// De-duplicate dependencies
+	for (const key of Object.keys(summary.dependencies)) {
+		summary.dependencies[key] = Array.from(new Set(summary.dependencies[key]));
 	}
 
 	summary.stats.components = uniqueComponents.size;

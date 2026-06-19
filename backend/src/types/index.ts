@@ -102,6 +102,7 @@ export interface RepositorySummary {
 	services: string[];
 	hooks: string[];
 	apiRoutes: string[];
+	dependencies: Record<string, string[]>;
 	stats: {
 		files: number;
 		components: number;
