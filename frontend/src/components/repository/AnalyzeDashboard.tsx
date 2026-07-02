@@ -15,7 +15,10 @@ import {
   ChevronUp,
   ChevronDown,
   Loader2,
+  MessageSquare,
 } from "lucide-react";
+import { useUiStore } from "@/store/ui-store";
+import { useRepoStore } from "@/store/repo-store";
 
 // ── Chart.js setup ──────────────────────────────────────────────────────────
 import {
@@ -418,12 +421,26 @@ export function AnalyzeDashboard() {
                     {repo.stats.functions.toLocaleString()}
                   </td>
                   <td className="px-4 py-3">
-                    <button
-                      onClick={() => router.push(`/${repo.namespace}/chat`)}
-                      className="text-xs text-[#98b090] hover:text-[#b5cdac] transition-colors flex items-center gap-1"
-                    >
-                      Open Chat <ArrowUpRight className="w-3 h-3" />
-                    </button>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => {
+                          useRepoStore.getState().setActiveRepo(repo);
+                          useUiStore.getState().setActiveView("chat");
+                        }}
+                        className="text-xs text-[#98b090] hover:text-[#b5cdac] transition-colors flex items-center gap-1.5"
+                      >
+                        <MessageSquare className="w-3.5 h-3.5" /> Chat
+                      </button>
+                      <button
+                        onClick={() => {
+                          useRepoStore.getState().setActiveRepo(repo);
+                          useUiStore.getState().setActiveView("canvas");
+                        }}
+                        className="text-xs text-[#CCD67F] hover:text-[#e4f09a] transition-colors flex items-center gap-1.5"
+                      >
+                        <Boxes className="w-3.5 h-3.5" /> Canvas
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

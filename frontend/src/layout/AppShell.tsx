@@ -45,8 +45,10 @@ export function AppShell({ namespace }: { namespace: string }) {
         <div className="shrink-0 h-12 flex items-center justify-between px-5 border-b border-white/[0.04] bg-[#0a0a0a]">
           <div className="flex items-center gap-2 text-xs text-[#6b6e66]">
             <GitBranch className="w-3.5 h-3.5" strokeWidth={1.5} />
-            <span className="text-[#8e9289] font-medium">{activeRepo.owner}/{activeRepo.repoName}</span>
-            {activeRepo.branch && (
+            <span className="text-[#8e9289] font-medium">
+              {("owner" in activeRepo ? activeRepo.owner : activeRepo.namespace.split("-")[0])}/{activeRepo.repoName}
+            </span>
+            {("branch" in activeRepo && activeRepo.branch) && (
               <>
                 <span className="text-[#4a4d46]">/</span>
                 <span className="text-[#6b6e66] font-mono text-[11px]">{activeRepo.branch}</span>
@@ -55,7 +57,9 @@ export function AppShell({ namespace }: { namespace: string }) {
           </div>
           <div className="flex items-center gap-3">
             <span className="text-[10px] text-[#4a4d46] font-mono">
-              {activeRepo.indexing.indexedChunks.toLocaleString()} chunks indexed
+              {("indexing" in activeRepo && activeRepo.indexing) 
+                ? `${activeRepo.indexing.indexedChunks.toLocaleString()} chunks indexed` 
+                : "Active Index"}
             </span>
           </div>
         </div>

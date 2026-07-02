@@ -8,3 +8,6 @@ coverage/
 .env.local
 .env.*.local
 *.log
+
+# Database
+auth.db

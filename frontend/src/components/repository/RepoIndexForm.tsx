@@ -40,7 +40,6 @@ export function RepoIndexForm() {
       const response = await api.indexRepository(values.repoUrl, values.branch);
       if ((response.data.statusCode === 200 || response.data.statusCode === 201) && response.data.data) {
         setActiveRepo(response.data.data);
-        router.push(`/${response.data.data.namespace}/chat`);
       } else {
         setErrorMsg(response.data.message || "Failed to index repository.");
       }

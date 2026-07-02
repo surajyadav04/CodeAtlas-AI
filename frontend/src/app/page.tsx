@@ -1,7 +1,7 @@
 import { Footer } from "@/layout/Footer";
 import { HeroSection } from "@/components/HeroSection";
 import { FeatureCards } from "@/components/FeatureCards";
-import { HowItWorks } from "@/components/HowItWorks";
+import { CTASection } from "@/components/CTASection";
 
 export default function Home() {
   return (
@@ -9,7 +9,7 @@ export default function Home() {
       <main className="flex-1">
         <HeroSection />
         <FeatureCards />
-        <HowItWorks />
+        <CTASection />
       </main>
       <Footer />
     </div>

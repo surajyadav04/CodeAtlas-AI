@@ -25,8 +25,8 @@ export function ChatSidebar() {
   ];
 
   const stats = [
-    { label: "Scanned Files", value: activeRepo.indexing.scannedFiles, icon: FileCode2 },
-    { label: "Indexed Chunks", value: activeRepo.indexing.indexedChunks, icon: Boxes },
+    { label: "Scanned Files", value: ("indexing" in activeRepo && activeRepo.indexing) ? activeRepo.indexing.scannedFiles : 0, icon: FileCode2 },
+    { label: "Indexed Chunks", value: ("indexing" in activeRepo && activeRepo.indexing) ? activeRepo.indexing.indexedChunks : 0, icon: Boxes },
   ];
 
   return (
@@ -48,7 +48,7 @@ export function ChatSidebar() {
             </span>
           </div>
           <div className="text-xs text-[#6b6e66] truncate pl-[26px]">
-            {activeRepo.owner}
+            {"owner" in activeRepo ? activeRepo.owner : activeRepo.namespace.split("-")[0]}
           </div>
         </div>
       </div>
